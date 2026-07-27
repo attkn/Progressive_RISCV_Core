@@ -1,0 +1,24 @@
+[options]
+mode prove
+depth 1
+
+[engines]
+smtbmc
+
+[script]
+read -define NO_PKG_EXPORT
+read -sv core_config_pkg.sv riscv_opcodes_pkg.sv riscv_ctrl_pkg.sv riscv_types_pkg.sv riscv_isa_id_pkg.sv riscv_pkg.sv
+read -sv aluIntRTL.sv
+read -sv formal/alu_int_fv.sv
+prep -top alu_int_fv
+
+[files]
+core_config_pkg.sv
+riscv_opcodes_pkg.sv
+riscv_ctrl_pkg.sv
+riscv_types_pkg.sv
+riscv_isa_id_pkg.sv
+riscv_pkg.sv
+riscv_imports.svh
+aluIntRTL.sv
+formal/alu_int_fv.sv

@@ -5,7 +5,27 @@
 // ============================================================================
 package riscv_types_pkg;
   import core_config_pkg::*;
+  import riscv_opcodes_pkg::*;
   import riscv_ctrl_pkg::*;
+
+  // ==========================================================================
+  //  DECODER CIKTISI — TIPLI ALANLAR
+  //  Control unit bunu alir ve  case (f.opcode)  ile calisir (ham bit yok).
+  //  funct3 HAM birakilir cunku anlami opcode'a gore degisir; control unit
+  //  baglama gore cast eder:  funct3_alu_e'(f.funct3) / funct3_mem_e'(f.funct3)
+  // ==========================================================================
+  typedef struct packed {
+    opcode_e               opcode;        // TIPLI
+    logic [2:0]            funct3;        // ham (baglama gore cast edilir)
+    funct7_e               funct7;        // TIPLI
+    logic [RS_ADDRESS-1:0] rs1;
+    logic [RS_ADDRESS-1:0] rs2;
+    logic [RS_ADDRESS-1:0] rd;
+    logic [WIDTH-1:0]      imm;
+    logic [4:0]            shamt;         // I-type shift: inst[24:20]
+    logic [11:0]           csr_addr;      // Zicsr: inst[31:20]
+    logic                  opcode_valid;  // taninan opcode mu
+  } instr_fields_t;
 
   // ---------------- kontrol demetleri ----------------
   typedef struct packed {                 // EX aşaması

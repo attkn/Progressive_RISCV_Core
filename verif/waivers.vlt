@@ -1,0 +1,24 @@
+// Lint waivers (all justified, benign). Keeps future REAL warnings visible.
+// NOT: dosya adlari repo'ya gore (RTL-siz).
+`verilator_config
+
+// Portable .svh include puts imports in $unit scope; module-scoped in
+// commercial tools. Not a bug.
+lint_off -rule IMPORTSTAR
+
+// WIDTH module param intentionally mirrors the package global default (reuse).
+lint_off -rule VARHIDDEN -file "*aluInt.sv"
+lint_off -rule VARHIDDEN -file "*aluBranch.sv"
+
+// Word-addressed memories: byte-offset / upper address bits unused by design.
+lint_off -rule UNUSEDSIGNAL -file "*leaf_imem.sv"
+lint_off -rule UNUSEDSIGNAL -file "*leaf_dmem.sv"
+
+// 6-bit shamt port; RV32 uses [4:0], bit5 reserved for RV64.
+lint_off -rule UNUSEDSIGNAL -file "*aluInt.sv"
+
+// Control unit consumes only opcode/funct fields of instr_fields_t.
+lint_off -rule UNUSEDSIGNAL -file "*control.sv"
+
+// illegal-CSR wired by trap machine in K2; intentionally unused in M0.
+lint_off -rule UNUSEDSIGNAL -file "*coreM0RTL.sv"

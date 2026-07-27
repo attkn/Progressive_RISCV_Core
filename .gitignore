@@ -1,0 +1,67 @@
+# ============================================================================
+#  .gitignore — Progressive RISC-V Core
+#  Kural: KAYNAK commit'lenir (rtl/, tb/, sw/*.py, scripts/, constraints/,
+#  Makefile), URETILEN her sey ignore. Hepsi tek komutla geri uretilir.
+# ============================================================================
+
+# ---- bizim build ciktilari ----
+build/
+*.vvp
+*.out
+sim
+scos
+sm0
+*.vcd
+*.fst
+*.wdb
+
+# uretilen program hex'i (asm.py uretir)
+sw/imem.mem
+sw/memData.mem
+*.mem
+
+# co-sim trace ciktilari
+*_trace.log
+golden_trace.log
+rtl_trace.log
+
+# ---- Vivado ara/uretilen dosyalari (repo kokune de sacilir) ----
+*.jou
+*.log
+*.str
+*.pb
+*.dcp
+*.rpt
+.Xil/
+.cache/
+.hw/
+.ip_user_files/
+.sim/
+xsim.dir/
+xvlog.pb
+xelab.pb
+xsim.jou
+xsim.log
+vivado*.jou
+vivado*.log
+vivado_pid*.str
+webtalk*.jou
+webtalk*.log
+usage_statistics_webtalk*
+*.wdb
+*.zip
+
+# Vivado proje dizinleri (create_project -force ile kuruluyor)
+*.xpr
+*.runs/
+*.sim/
+*.gen/
+*.srcs/
+*.hbs
+
+# ---- editor / OS ----
+*~
+*.swp
+.vscode/
+.idea/
+.DS_Store

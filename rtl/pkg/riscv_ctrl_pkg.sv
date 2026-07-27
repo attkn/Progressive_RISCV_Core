@@ -46,6 +46,13 @@ package riscv_ctrl_pkg;
   // writeback kaynağı
   typedef enum logic [1:0] { WB_ALU, WB_MEM, WB_PC4, WB_CSR } wb_sel_e;
 
+  // forwarding kaynağı (bypass ağı)
+  typedef enum logic [1:0] {
+    FWD_NONE,     // register file'dan oku (bypass yok)
+    FWD_EX_MEM,   // EX/MEM'den ilet (en taze deger — ONCELIKLI)
+    FWD_MEM_WB    // MEM/WB'den ilet
+  } fwd_sel_e;
+
   // CSR işlemi (Zicsr)
   typedef enum logic [1:0] { CSR_OP_NONE, CSR_OP_RW, CSR_OP_RS, CSR_OP_RC } csr_op_e;
 

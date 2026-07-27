@@ -1,0 +1,44 @@
+# ============================================================================
+#  .github/workflows/ci.yml  —  RV32IMACBFV surekli entegrasyon
+#  Bu dosyayi repo'da  .github/workflows/ci.yml  yoluna koy.
+#    * her push/PR: lint + birim sim + co-sim (hizli)
+#    * gecelik    : tam regresyon (arch-test/riscv-dv — hazir olunca)
+# ============================================================================
+name: ci
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: '0 2 * * *'          # gecelik 02:00 UTC (tam regresyon)
+
+jobs:
+  fast:                          # commit-basi hizli kapi
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Araclari kur
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y iverilog verilator python3
+      - name: Lint (Verilator, waiver'li)
+        run: make lint
+      - name: Birim + entegrasyon sim
+        run: make sim
+      - name: Co-simulation (golden lockstep)
+        run: make cosim
+
+  nightly:                       # gecelik tam regresyon
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Araclari kur
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y iverilog verilator python3
+      # Spike + riscv-arch-test + riscv-dv burada kurulur (hazir olunca)
+      - name: Tam regresyon (placeholder)
+        run: |
+          make lint
+          make cosim
+          echo "TODO: arch-test / riscv-dv / Spike lockstep tam suite"
