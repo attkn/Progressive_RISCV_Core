@@ -1,31 +1,29 @@
-import riscv_pgk::*;
+module dataMemoryRTL (
+    input logic clk_i,
+    input logic rst_ni,
+    
+    input logic [XLEN-1:0] writeAddress_i,
+    input logic [XLEN-1:0] writeData_i,
+    input logic writeEnable_i,
 
-module dataMemoryRTL(
-    input   logic   clk_i,
-    input   logic   rst_ni,
-
-    input   logic   [WIDTH-1:0]address_i,
-    input   logic   data_i,
-    input   logic   writeEn_i,
-    input   logic   readEn_i,
-
-    output  logic   [WIDTH-1:0]data_o 
+    input logic [XLEN-1:0] readAddress_i,
+    input logic readEnable_i,
+    output logic [XLEN-1:0] readData_o
 
 );
-    logic [WIDTH-1:0]mem[DATA_MEM_SIZE:0];
-    initial $readmemh(MEM_DATA , mem);
+    logic [XLEN-1:0]mem[DATA_MEM_LENGTH-1:0];
 
-    always_ff @(posedge clk_i , negedge rst_ni)begin
+    always_ff @(posedge clk_i)begin
         if(!rst_ni)begin
-            mem <= '{default:0};
+            $readmemh("dataMemory.mem" , mem);
         end else begin
-            if(dataWrite_i)begin
-                mem[address_i] <= data_i;
-            end else begin
-                mem <= mem;
+            if(writeEnable_i)begin
+                mem[writeAddress_i] <= writeData_i;
+            end
+
+            if(readEnable_i)begin
+                readData_o <= mem[readAddress_i];
             end
         end
     end
-
-    assign data_o = (readEn_i) ? mem[address_i] : 0;
 endmodule
