@@ -3,82 +3,104 @@
 module tb_mulTopRTL();
 
     localparam int XLEN = 32;
-    localparam int MODE = 4;
+    localparam time CLK_PERIOD = 10ns;
 
-    logic [XLEN-1:0]     in0_i;
-    logic [XLEN-1:0]     in1_i;
-    logic [MODE-1:0]     mode_i;
-    logic [(XLEN*2)-1:0] result_o;
+    logic                 clk_i;
+    logic                 rst_ni;
+    logic                 start_i;
+    logic [XLEN-1:0]      in0_i;
+    logic [XLEN-1:0]      in1_i;
+    logic [1:0]           mode_i;
+    logic                 done_o;
+    logic [2*XLEN-1:0]    result_o;
 
-    // DUT Örnekleme
     mulTopRTL #(
-        .XLEN(XLEN),
-        .MODE(MODE)
+        .XLEN(XLEN)
     ) dut (
+        .clk_i   (clk_i),
+        .rst_ni  (rst_ni),
+        .start_i (start_i),
         .in0_i   (in0_i),
         .in1_i   (in1_i),
         .mode_i  (mode_i),
+        .done_o  (done_o),
         .result_o(result_o)
     );
 
-    // Test Senaryoları
     initial begin
-        // Başlangıç değerleri
-        in0_i  = '0;
-        in1_i  = '0;
-        mode_i = '0;
-        #10;
+        clk_i = 0;
+        forever #(CLK_PERIOD / 2) clk_i = ~clk_i;
+    end
 
-        // Mode 00: Unsigned x Unsigned (uu)
-        mode_i = 4'b0000;
-        in0_i  = 32'd10;
-        in1_i  = 32'd5;
-        #10;
-        $display("[uu] in0: %h, in1: %h | result_o: %h (%0d)", in0_i, in1_i, result_o, result_o);
+    task automatic check_mul(
+        input logic [XLEN-1:0] a,
+        input logic [XLEN-1:0] b,
+        input logic [1:0]      m,
+        input string           test_name
+    );
+        logic signed [2*XLEN-1:0] expected_res;
+        
+        case (m)
+            2'b00: expected_res = 64'({32'b0, a}) * 64'({32'b0, b});
+            2'b01: expected_res = 64'($signed(a)) * 64'({32'b0, b});
+            2'b10: expected_res = 64'({32'b0, a}) * 64'($signed(b));
+            2'b11: expected_res = 64'($signed(a)) * 64'($signed(b));
+        endcase
 
-        in0_i  = 32'hFFFF_FFFF;
-        in1_i  = 32'd2;
-        #10;
-        $display("[uu] in0: %h, in1: %h | result_o: %h (%0d)", in0_i, in1_i, result_o, result_o);
+        @(posedge clk_i);
+        start_i <= 1'b1;
+        in0_i   <= a;
+        in1_i   <= b;
+        mode_i  <= m;
 
-        // Mode 01: Unsigned x Signed (us)
-        mode_i = 4'b0001;
-        in0_i  = 32'd10;
-        in1_i  = -32'd5;
-        #10;
-        $display("[us] in0: %h, in1: %h | result_o: %h (%0d)", in0_i, in1_i, result_o, $signed(result_o));
+        @(posedge clk_i);
+        start_i <= 1'b0;
 
-        // Mode 10: Signed x Unsigned (su)
-        mode_i = 4'b0010;
-        in0_i  = -32'd10;
-        in1_i  = 32'd5;
-        #10;
-        $display("[su] in0: %h, in1: %h | result_o: %h (%0d)", in0_i, in1_i, result_o, $signed(result_o));
+        @(posedge clk_i);
+        @(posedge clk_i);
+        #1;
 
-        // Mode 11: Signed x Signed (ss)
-        mode_i = 4'b0011;
-        in0_i  = -32'd10;
-        in1_i  = -32'd5;
-        #10;
-        $display("[ss] in0: %h, in1: %h | result_o: %h (%0d)", in0_i, in1_i, result_o, $signed(result_o));
+        if (done_o !== 1'b1) begin
+            $display("[FAIL] %-12s | done_o bekleniyordu ama 0 geldi!", test_name);
+        end else if (result_o === expected_res) begin
+            $display("[PASS] %-12s | Mode: %b | in0: %h, in1: %h | Res: %h", 
+                     test_name, m, a, b, result_o);
+        end else begin
+            $display("[FAIL] %-12s | Mode: %b | in0: %h, in1: %h | Beklenen: %h, Gelen: %h", 
+                     test_name, m, a, b, expected_res, result_o);
+        end
+    endtask
 
-        in0_i  = 32'h7FFF_FFFF;
-        in1_i  = 32'h7FFF_FFFF;
-        #10;
-        $display("[ss] in0: %h, in1: %h | result_o: %h (%0d)", in0_i, in1_i, result_o, $signed(result_o));
+    initial begin
+        rst_ni  = 0;
+        start_i = 0;
+        in0_i   = '0;
+        in1_i   = '0;
+        mode_i  = '0;
+        #(CLK_PERIOD * 2);
+        rst_ni  = 1;
+        #(CLK_PERIOD);
 
-        // Ekstra rastgele değer denemeleri
-        for (int m = 0; m < 4; m++) begin
-            mode_i = m;
-            for (int k = 0; k < 3; k++) begin
-                in0_i = $urandom();
-                in1_i = $urandom();
-                #10;
-                $display("[Mode %0b] in0: %h, in1: %h | result_o: %h", mode_i[1:0], in0_i, in1_i, result_o);
-            end
+        check_mul(32'd10, 32'd5, 2'b00, "UU Basit");
+        check_mul(32'hFFFF_FFFF, 32'd2, 2'b00, "UU Max In0");
+        check_mul(32'hFFFF_FFFF, 32'hFFFF_FFFF, 2'b00, "UU Full Max");
+
+        check_mul(-32'd10, 32'd5, 2'b01, "SU Neg x Poz");
+        check_mul(-32'd1, 32'hFFFF_FFFF, 2'b01, "SU -1 x MaxU");
+
+        check_mul(32'd5, -32'd10, 2'b10, "US Poz x Neg");
+        check_mul(32'hFFFF_FFFF, -32'd1, 2'b10, "US MaxU x -1");
+
+        check_mul(-32'd2, -32'd3, 2'b11, "SS Neg x Neg");
+        check_mul(-32'd10, 32'd5, 2'b11, "SS Neg x Poz");
+        check_mul(32'h8000_0000, 32'd1, 2'b11, "SS Min Int");
+        check_mul(32'h8000_0000, -32'd1, 2'b11, "SS Min x -1");
+
+        for (int k = 0; k < 20; k++) begin
+            check_mul($urandom(), $urandom(), $urandom_range(0, 3), "Rastgele");
         end
 
-        #20;
+        #(CLK_PERIOD * 2);
         $finish;
     end
 
