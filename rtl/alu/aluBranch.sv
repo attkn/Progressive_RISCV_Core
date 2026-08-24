@@ -1,5 +1,5 @@
 `include "riscv_imports.svh"
-module aluBranchRTL #(parameter int WIDTH = 32)(
+module aluBranch #(parameter int WIDTH = 32)(
   input  branch_op_e       brOp_i,
   input  logic [WIDTH-1:0] rd1_i, rd2_i,
   output logic             branchTaken_o
@@ -17,7 +17,7 @@ module aluBranchRTL #(parameter int WIDTH = 32)(
       BR_GE : branchTaken_o = !lt_s;
       BR_LTU: branchTaken_o =  lt_u;
       BR_GEU: branchTaken_o = !lt_u;
-      default : ;
+      default : branchTaken_o = 0;
     endcase
   end
 endmodule

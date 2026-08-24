@@ -1,5 +1,5 @@
 `include "riscv_imports.svh"
-module aluIntRTL #(parameter int WIDTH = 32)(
+module aluInt #(parameter int WIDTH = 32)(
   input  alu_op_int_e      aluOp_i,
   input  logic [WIDTH-1:0] rd1_i, rd2_i,
   input  logic [5:0]       shift_size,
@@ -20,7 +20,7 @@ module aluIntRTL #(parameter int WIDTH = 32)(
       ALU_SRA : result_o = $unsigned($signed(rd1_i) >>> shamt);
       ALU_SLT : result_o = {{(WIDTH-1){1'b0}}, ($signed(rd1_i) < $signed(rd2_i))};
       ALU_SLTU: result_o = {{(WIDTH-1){1'b0}}, (rd1_i < rd2_i)};
-      default : ;
+      default : result_o = 0;
     endcase
   end
 endmodule

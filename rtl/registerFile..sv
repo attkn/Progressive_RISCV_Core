@@ -1,5 +1,5 @@
 `include "riscv_include.svh"
-module registerFileRTL(
+module registerFile(
     input   logic       clk_i,
     input   logic       rst_ni,
 
