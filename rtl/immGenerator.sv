@@ -1,9 +1,9 @@
 module immGenerator
-    import riscv_types::*;
+    import riscv_opcodes::*, riscv_types::*;
 #(
     parameter int unsigned XLEN = 32
 ) (
-    input  immType_e         immType_i,
+    input  imm_type_e         immType_i,
     input  logic      [31:0] instr_i,
     output logic [XLEN-1:0]  imm_o
 );
@@ -32,12 +32,12 @@ module immGenerator
 
     always_comb begin
         unique case (immType_i)
-            I_TYPE : imm_sel = imm_i_type;
-            S_TYPE : imm_sel = imm_s_type;
-            B_TYPE : imm_sel = imm_b_type;
-            U_TYPE : imm_sel = imm_u_type;
-            J_TYPE : imm_sel = imm_j_type;
-            Z_TYPE : imm_sel = imm_z_type;
+            IMM_I : imm_sel = imm_i_type;
+            IMM_S : imm_sel = imm_s_type;
+            IMM_B : imm_sel = imm_b_type;
+            IMM_U : imm_sel = imm_u_type;
+            IMM_J : imm_sel = imm_j_type;
+            IMM_Z : imm_sel = imm_z_type;
             default: imm_sel = '0;
         endcase
     end

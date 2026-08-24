@@ -1,6 +1,6 @@
-`include "riscv_imports.svh"
-module aluBranch #(parameter int WIDTH = 32)(
-  input  branch_op_e       brOp_i,
+module aluBranch import riscv_opcodes::*, riscv_types::*;
+ #(parameter int WIDTH = 32)(
+  input  aluOpBranch_e       brOp_i,
   input  logic [WIDTH-1:0] rd1_i, rd2_i,
   output logic             branchTaken_o
 );
@@ -11,12 +11,12 @@ module aluBranch #(parameter int WIDTH = 32)(
   always_comb begin
     branchTaken_o = 1'b0;
     unique case (brOp_i)
-      BR_EQ : branchTaken_o =  eq;
-      BR_NE : branchTaken_o = !eq;
-      BR_LT : branchTaken_o =  lt_s;
-      BR_GE : branchTaken_o = !lt_s;
-      BR_LTU: branchTaken_o =  lt_u;
-      BR_GEU: branchTaken_o = !lt_u;
+      ALU_BEQ : branchTaken_o =  eq;
+      ALU_BNE : branchTaken_o = !eq;
+      ALU_BLT : branchTaken_o =  lt_s;
+      ALU_BGE : branchTaken_o = !lt_s;
+      ALU_BLTU: branchTaken_o =  lt_u;
+      ALU_BGEU: branchTaken_o = !lt_u;
       default : branchTaken_o = 0;
     endcase
   end

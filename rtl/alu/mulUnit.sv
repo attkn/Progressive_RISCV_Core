@@ -1,6 +1,6 @@
 `timescale 1ns/1ps
 
-module mulTopRTL #(
+module mulTopRTL import riscv_opcodes::*, riscv_types::*; #(
     parameter int XLEN = 32
 )(
     input  logic                 clk_i,

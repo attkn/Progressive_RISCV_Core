@@ -1,5 +1,4 @@
-`include "riscv_include.svh"
-module registerFile(
+module registerFile import riscv_opcodes::*, riscv_types::*;(
     input   logic       clk_i,
     input   logic       rst_ni,
 

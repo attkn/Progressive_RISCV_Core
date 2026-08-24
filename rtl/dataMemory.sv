@@ -1,4 +1,4 @@
-module dataMemoryRTL (
+module dataMemoryRTL import riscv_pkg::*; (
     input logic clk_i,
     input logic rst_ni,
     

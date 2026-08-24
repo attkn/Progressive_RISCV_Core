@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module divUnitRTL (
+module divUnitRTL import riscv_opcodes::*, riscv_types::*; (
     input  logic        clk_i,
     input  logic        rst_ni,
 

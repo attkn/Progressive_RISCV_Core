@@ -4,6 +4,8 @@
 #  Makefile), URETILEN her sey ignore. Hepsi tek komutla geri uretilir.
 # ============================================================================
 
+vivado
+
 # ---- bizim build ciktilari ----
 build/
 *.vvp
